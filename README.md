@@ -2,7 +2,7 @@
 
 Código do artigo desenvolvido na disciplina Análise de Dados e Aprendizado de Máquina (PPGIA/UFRPE).
 
-O trabalho prevê, com **10 minutos de antecedência**, se a primeira tentativa de execução de uma tarefa no Google Cluster Data 2011 terminará em falha (FAIL) ou em conclusão normal (FINISH). São usadas duas etapas de aprendizado de máquina sobre a mesma base: agrupamento com K-Means (exploratório) e classificação com Random Forest.
+O trabalho prevê, com **10 minutos de antecedência**, se a primeira tentativa de execução de uma tarefa no Google Cluster Data 2011 terminará em falha (FAIL) ou em conclusão normal (FINISH). São usadas duas etapas de aprendizado de máquina sobre a mesma base: uma análise não supervisionada, que compara **K-Means** e **DBSCAN**, e uma classificação supervisionada, que compara **Random Forest** e **XGBoost**.
 
 ## Dados
 
@@ -18,8 +18,8 @@ notebooks/
   01_eventos_tarefas.ipynb        rótulo, amostra e unidade de análise (primeira tentativa)
   02_uso_tarefas.ipynb            horizonte de 10 min e agregação do consumo por tarefa
   03_analise_exploratoria.ipynb   análise exploratória (seção 5 do artigo)
-  04_agrupamento.ipynb            K-Means (a incluir)
-  05_classificacao.ipynb          Random Forest e comparação (a incluir)
+  04_agrupamento.ipynb            K-Means e DBSCAN (a incluir)
+  05_classificacao.ipynb          Random Forest e XGBoost (a incluir)
 figuras/                          figuras usadas no artigo
 requirements.txt
 ```
@@ -37,8 +37,13 @@ requirements.txt
 | Rótulo FAIL x FINISH | EVICT, KILL e LOST refletem remoção pelo escalonador, encerramento pelo usuário ou perda do registro, não o desfecho da execução |
 | Primeira tentativa como unidade | exigir um único evento terminal excluía 99,4% das tarefas com falha; usar todas as tentativas deixava 82% das falhas vindas de tarefas com mais de 100 ressubmissões |
 | Horizonte de 10 min por timestamp | só entram medições encerradas até 10 min antes do evento terminal |
-| Divisão cronológica | treino nos dias 1 a 23 (validação nos dias 20 a 23) e teste nos dias 24 a 29 |
+| Divisão cronológica | treino nos dias 1 a 19, validação nos dias 20 a 23 e teste nos dias 24 a 29; as estatísticas exploratórias usam os dias 1 a 23 |
+| Divisão por job | cada job vai por inteiro para o conjunto do dia de sua primeira tarefa, o que elimina a sobreposição de jobs entre treino, validação e teste |
+| Peso por job | cada tarefa pesa o inverso do tamanho do seu job, para que um job com milhares de tarefas não pese como milhares de falhas independentes |
 | Dias 2 e 10 mantidos no treino | na primeira tentativa, a taxa de falha desses dias fica abaixo da média |
+| Atributos | conjunto de Santos (2023), sem os tempos de disco (não registrados a partir do 15º dia) |
+| Modelo principal sem `tempo_obs` e `n_janelas` | carregam a duração total da tarefa por causa do corte ancorado no término; entram apenas em uma variante de comparação |
+| Algoritmos | não supervisionado: K-Means (k pelo cotovelo e pela silhueta) e DBSCAN; supervisionado: Random Forest (`class_weight='balanced'`) e XGBoost (`scale_pos_weight`) |
 
 ## Resultados intermediários (amostra de 10%)
 
@@ -47,6 +52,8 @@ requirements.txt
 | Primeira tentativa (FAIL ou FINISH) | 1.821.654 | 100.730 (5,53%) |
 | Base de modelagem (com janela válida antes do horizonte) | 724.349 | 46.045 (6,36%) |
 | Teste (dias 24 a 29) | 134.744 | 6,73% |
+
+Na análise exploratória (notebook 03), os 10 jobs com mais falhas concentram 75,6% das falhas da base de modelagem, e o maior deles (job 6337545460, dia 11) responde sozinho por 42,5%. O job 6449919400, do dia 25, responde por 73% das falhas do teste.
 
 ## Referência principal
 
