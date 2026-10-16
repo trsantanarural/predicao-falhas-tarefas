@@ -40,8 +40,10 @@ requirements.txt
 | Divisão cronológica | treino nos dias 1 a 19, validação nos dias 20 a 23 (hiperparâmetros e limiar de decisão) e teste nos dias 24 a 29; o modelo final é reajustado nos dias 1 a 23 (treino e validação), como em Santos (2023); as estatísticas exploratórias também usam os dias 1 a 23, para não consultar o teste |
 | Divisão por job | cada job vai por inteiro para o conjunto do dia de sua primeira tarefa, o que elimina a sobreposição de jobs entre treino, validação e teste |
 | Peso por job | cada tarefa pesa o inverso do tamanho do seu job, para que um job com milhares de tarefas não pese como milhares de falhas independentes |
+| Jobs dominantes | as comparações entre classes são reportadas com e sem os três jobs de maior número de falhas nos dias 1 a 23 (análise de sensibilidade; nenhum registro é removido da base de modelagem) |
 | Dias 2 e 10 mantidos no treino | na primeira tentativa, a taxa de falha desses dias fica abaixo da média |
 | Atributos | conjunto de Santos (2023), sem os tempos de disco (não registrados a partir do 15º dia) |
+| Valores ausentes | CPI e MAI são os únicos atributos com ausência (18,0% e 21,0% das tarefas dos dias 1 a 23); são imputados pela mediana do treino, com indicador de ausência, porque a taxa de falha entre as tarefas com ausência é menor |
 | Modelo principal sem `tempo_obs` e `n_janelas` | carregam a duração total da tarefa por causa do corte ancorado no término; entram apenas em uma variante de comparação |
 | Algoritmos | não supervisionado: K-Means (k pelo cotovelo e pela silhueta) e DBSCAN; supervisionado: Random Forest (`class_weight='balanced'`) e XGBoost (`scale_pos_weight`) |
 
