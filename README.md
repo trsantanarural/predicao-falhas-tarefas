@@ -37,7 +37,7 @@ requirements.txt
 | Rótulo FAIL x FINISH | EVICT, KILL e LOST refletem remoção pelo escalonador, encerramento pelo usuário ou perda do registro, não o desfecho da execução |
 | Primeira tentativa como unidade | exigir um único evento terminal excluía 99,4% das tarefas com falha; usar todas as tentativas deixava 82% das falhas vindas de tarefas com mais de 100 ressubmissões |
 | Horizonte de 10 min por timestamp | só entram medições encerradas até 10 min antes do evento terminal |
-| Divisão cronológica | treino nos dias 1 a 19, validação nos dias 20 a 23 e teste nos dias 24 a 29; as estatísticas exploratórias usam os dias 1 a 23 |
+| Divisão cronológica | treino nos dias 1 a 19, validação nos dias 20 a 23 (hiperparâmetros e limiar de decisão) e teste nos dias 24 a 29; o modelo final é reajustado nos dias 1 a 23 (treino e validação), como em Santos (2023); as estatísticas exploratórias também usam os dias 1 a 23, para não consultar o teste |
 | Divisão por job | cada job vai por inteiro para o conjunto do dia de sua primeira tarefa, o que elimina a sobreposição de jobs entre treino, validação e teste |
 | Peso por job | cada tarefa pesa o inverso do tamanho do seu job, para que um job com milhares de tarefas não pese como milhares de falhas independentes |
 | Dias 2 e 10 mantidos no treino | na primeira tentativa, a taxa de falha desses dias fica abaixo da média |
