@@ -59,11 +59,27 @@ requirements.txt
 
 Na análise exploratória (notebook 03), os 10 jobs com mais falhas concentram 75,6% das falhas da base de modelagem, e o maior deles (job 6337545460, dia 11) responde sozinho por 42,5%. O job 6449919400, do dia 25, responde por 73% das falhas do teste.
 
-## Agrupamento (notebook 04)
+## Notebooks
 
-- K-Means: k = 2 pela silhueta média (0,681); o cotovelo, traçado a partir de k = 1, indica k = 3; k = 3 entra na análise de sensibilidade.
-- DBSCAN: minPts = 22, amostra de 60.560 tarefas (limite de 50 por job). O cotovelo indica ε = 1,6239, que excede o limite de 4 GB de memória do notebook; foi adotado ε = 1,0, com sensibilidade em ε = 0,5, 0,7 e 1,3 (vetores idênticos reunidos em um ponto com peso).
-- A taxa de falha por grupo e o escore de atipicidade (ROC-AUC e PR-AUC) são avaliados com e sem o job com mais falhas de cada conjunto; as saídas (`agrupamento_*.csv`) ficam no Google Drive, em `MyDrive/artigo_predicao/saida`, e não no repositório.
+Todos leem e gravam em `MyDrive/artigo_predicao` (dados intermediários em `saida/`, que não faz parte do repositório).
+
+**01. Eventos de tarefa** (`01_eventos_tarefas.ipynb`)
+- Faz: lê `task_events` em lotes, define o rótulo FAIL x FINISH e compara três unidades de análise; adota a primeira tentativa de cada tarefa.
+- Saída: `saida/primeira_tentativa.parquet` (1.821.654 tarefas, 100.730 falhas).
+
+**02. Uso de recursos** (`02_uso_tarefas.ipynb`)
+- Faz: lê `task_usage`, aplica o horizonte de 10 min por timestamp e agrega o consumo por tarefa.
+- Saída: `saida/base_modelagem.parquet` (724.349 tarefas, 46.045 falhas).
+
+**03. Análise exploratória** (`03_analise_exploratoria.ipynb`, Seção 5 do artigo)
+- Faz: taxa de falha por dia, concentração de falhas por job, valores ausentes de CPI e MAI e comparação dos atributos entre as classes, com e sem os jobs dominantes. As estatísticas por dia usam o dia de cada tarefa; a divisão por job é feita no notebook 04.
+- Saída: `figuras/taxa_falha_dia.png`, `figuras/concentracao_falhas_job.png` e `figuras/atributos_por_classe.png`.
+
+**04. Agrupamento** (`04_agrupamento.ipynb`, Seção 6.1 do artigo)
+- Faz: divisão por job; K-Means (k = 2 pela silhueta média de 0,681; o cotovelo, traçado a partir de k = 1, indica k = 3, que entra na sensibilidade); DBSCAN com minPts = 22 em amostra de 60.560 tarefas (limite de 50 por job). O ε do cotovelo (1,6239) excede o limite de 4 GB de memória do notebook, então foi adotado ε = 1,0, com sensibilidade em ε = 0,5, 0,7 e 1,3 (vetores idênticos reunidos em um ponto com peso). Avalia a taxa de falha por grupo e o escore de atipicidade (ROC-AUC e PR-AUC), com e sem o job com mais falhas de cada conjunto.
+- Saída: `saida/base_conjuntos.parquet` e `saida/agrupamento_*.csv` (no Drive, não no repositório); figuras `kmeans_cotovelo_silhueta.png`, `kmeans_silhueta_grupos.png`, `agrupamento_pca.png` e `dbscan_kdistance.png`.
+
+**05. Classificação** (`05_classificacao.ipynb`, Seção 6.2 do artigo): Random Forest e XGBoost sobre `saida/base_conjuntos.parquet`; a incluir.
 
 ## Referência principal
 
