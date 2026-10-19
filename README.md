@@ -19,7 +19,8 @@ notebooks/
   02_uso_tarefas.ipynb            horizonte de 10 min e agregação do consumo por tarefa
   03_analise_exploratoria.ipynb   análise exploratória (seção 5 do artigo)
   04_agrupamento.ipynb            K-Means e DBSCAN, taxa de falha por grupo e sensibilidade
-  05_classificacao.ipynb          Random Forest e XGBoost (a incluir)
+  05_classificacao.ipynb          Random Forest e XGBoost, variantes de atributos e SHAP
+  06_intervalos_bootstrap.ipynb   intervalos de confiança por bootstrap de jobs
 figuras/                          figuras usadas no artigo (inclui as do agrupamento)
 requirements.txt
 ```
@@ -79,7 +80,14 @@ Todos leem e gravam em `MyDrive/artigo_predicao` (dados intermediários em `said
 - Faz: divisão por job; K-Means (k = 2 pela silhueta média de 0,681; o cotovelo, traçado a partir de k = 1, indica k = 3, que entra na sensibilidade); DBSCAN com minPts = 22 em amostra de 60.560 tarefas (limite de 50 por job). O ε do cotovelo (1,6239) excede o limite de 4 GB de memória do notebook, então foi adotado ε = 1,0, com sensibilidade em ε = 0,5, 0,7 e 1,3 (vetores idênticos reunidos em um ponto com peso). Avalia a taxa de falha por grupo e o escore de atipicidade (ROC-AUC e PR-AUC), com e sem o job com mais falhas de cada conjunto.
 - Saída: `saida/base_conjuntos.parquet` e `saida/agrupamento_*.csv` (no Drive, não no repositório); figuras `kmeans_cotovelo_silhueta.png`, `kmeans_silhueta_grupos.png`, `agrupamento_pca.png` e `dbscan_kdistance.png`.
 
-**05. Classificação** (`05_classificacao.ipynb`, Seção 6.2 do artigo): Random Forest e XGBoost sobre `saida/base_conjuntos.parquet`; a incluir.
+**05. Classificação** (`05_classificacao.ipynb`, Seção 6.2 do artigo)
+- Faz: Random Forest (`class_weight='balanced'`) e XGBoost (`scale_pos_weight`) com peso por job; busca aleatória de hiperparâmetros na validação (6 configurações no Random Forest e 10 no XGBoost, critério PR-AUC ponderada por job); limiar de decisão que maximiza o F1 da falha na validação; reajuste nos dias 1 a 23 e avaliação no teste, com todos os jobs e sem o job dominante do teste. Variantes de atributos: principal (priority, cpu_req, ram_req, disk_req e 11 métricas de consumo), com tempo observado (`tempo_obs`, `n_janelas`), com filtro de Pearson (|r| > 0,8, calculado nos dias 1 a 19), as duas juntas e uma extensão com `scheduling_class`, hora do dia e dia da semana (atraso de escalonamento não extraído: `EXTRAIR_ATRASO = False`). SHAP (TreeExplainer) no XGBoost principal, em amostras de 2.000 tarefas do teste.
+- Grava checkpoints em `saida/classificacao_ckpt/` (busca de hiperparâmetros e cada par variante x algoritmo); se a sessão cair, rodar o notebook de novo do início retoma do que já foi concluído (`RETOMAR = True`).
+- Saída: `saida/classificacao_*.csv` (métricas, limiares, hiperparâmetros, busca, filtro de Pearson e SHAP), `saida/classificacao_predicoes_teste.parquet` e as figuras `classificacao_curvas_teste.png`, `shap_importancia.png` e `shap_resumo.png`.
+
+**06. Intervalos de confiança** (`06_intervalos_bootstrap.ipynb`, Seção 6.2 do artigo)
+- Faz: bootstrap de jobs (2.000 reamostragens dos 1.697 jobs do teste, limiar fixo) sobre as predições do notebook 05, com intervalos de 95% para ROC-AUC, PR-AUC, precisão, recall e F1 da falha, e diferenças pareadas entre variantes e entre algoritmos. Não reajusta modelos.
+- Saída: `saida/classificacao_bootstrap.csv` e `saida/classificacao_bootstrap_diferencas.csv`.
 
 ## Referência principal
 
