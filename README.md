@@ -81,6 +81,8 @@ Todos leem e gravam em `MyDrive/artigo_predicao` (dados intermediários em `said
 
 **04. Agrupamento** (`04_agrupamento.ipynb`, Seção 6.1 do artigo)
 - Faz: divisão por job (treino nos dias 1 a 23 e teste nos dias 24 a 29); K-Means ajustado no treino (k pela silhueta média; o cotovelo, traçado a partir de k = 1, e k = 3 entram na sensibilidade); DBSCAN com minPts = 22 em amostra do treino com limite de tarefas por job. O ε vem do cotovelo da curva de distâncias quando a estimativa de memória cabe no limite de 4 GB; caso contrário, `EPS_ESCOLHIDO` define o valor adotado (a célula para com um aviso se a estimativa passar do limite), com sensibilidade em outros ε (vetores idênticos reunidos em um ponto com peso). Avalia a taxa de falha por grupo, o escore de atipicidade (ROC-AUC) e o ruído do DBSCAN como preditor de falha (precisão, recall e F1), com e sem os jobs dominantes.
+- Valores adotados na última execução: k = 2 (silhueta média 0,675) e, no DBSCAN, minPts = 22 e ε = 0,7 (`EPS_ESCOLHIDO`; o ε do cotovelo, 1,65, excede o limite de memória), em amostra de 74.968 tarefas.
+- Sensibilidade: k = 3 a 6 no K-Means; grade de ε e minPts no DBSCAN e comparação com o HDBSCAN (seção 13, pacote `hdbscan`), com escolha feita só pelo treino (ROC-AUC do escore na amostra, com no máximo 20% de ruído); o teste só mede.
 - Saída: `saida/base_conjuntos.parquet` e `saida/agrupamento_*.csv` (no Drive, não no repositório); figuras `kmeans_cotovelo_silhueta.png`, `kmeans_silhueta_grupos.png`, `agrupamento_pca.png` e `dbscan_kdistance.png`.
 
 **05. Classificação** (`05_classificacao.ipynb`, Seção 6.2 do artigo)
