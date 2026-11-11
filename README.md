@@ -48,7 +48,7 @@ requirements.txt
 | Valores ausentes | CPI e MAI são os únicos atributos com ausência (18,0% e 21,0% das tarefas dos dias 1 a 23); são imputados pela mediana do treino, com indicador de ausência, porque a taxa de falha entre as tarefas com ausência é menor |
 | Modelo principal sem `tempo_obs` e `n_janelas` | carregam a duração total da tarefa por causa do corte ancorado no término; entram apenas em uma variante de comparação |
 | Algoritmos | não supervisionado: K-Means (k pelo cotovelo e pela silhueta) e DBSCAN; supervisionado: Random Forest (`class_weight='balanced'`) e XGBoost (`scale_pos_weight`) |
-| Métricas | as de Santos (2023): acurácia, precisão, recall e F1 por classe e médias das duas classes, ROC-AUC e matriz de confusão, além da taxa de falsos positivos; intervalos de 95% por bootstrap de jobs |
+| Métricas: acurácia, precisão, recall e F1 por classe e médias das duas classes, ROC-AUC e matriz de confusão, além da taxa de falsos positivos; intervalos de 95% por bootstrap de jobs |
 
 ## Resultados intermediários (amostra de 10%)
 
