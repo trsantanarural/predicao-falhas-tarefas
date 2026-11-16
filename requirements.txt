@@ -2,7 +2,6 @@ pandas
 numpy
 pyarrow
 matplotlib
-seaborn
 scikit-learn
 xgboost
 shap
